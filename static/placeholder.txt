@@ -1,0 +1,1 @@
+Put static assets here (CSS, JS, images) if needed.

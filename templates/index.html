@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>AI Personal Finance Advisor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>AI Personal Finance Advisor</h1>
+      <p class="lead">Quick budgeting, debt payoff and investment suggestions — interactive demo</p>
+    </header>
+
+    <main>
+      <form id="advice-form" method="post" novalidate>
+        <section class="card">
+          <label class="field">
+            <span class="label">Monthly Income</span>
+            <input id="monthly_income" name="monthly_income" type="number" step="0.01" required>
+          </label>
+        </section>
+
+        <section class="card">
+          <label class="field">
+            <span class="label">Expenses (one per line as: description,amount)</span>
+            <textarea id="expenses" name="expenses" placeholder="rent,1200\ngroceries,300\nnetflix,12"></textarea>
+          </label>
+        </section>
+
+        <section class="card grid-3">
+          <label class="field"><span class="label">Debt total</span><input id="debt_total" name="debt_total" type="number" step="0.01"></label>
+          <label class="field"><span class="label">Monthly payment</span><input id="debt_monthly" name="debt_monthly" type="number" step="0.01"></label>
+          <label class="field"><span class="label">Interest rate (%)</span><input id="debt_rate" name="debt_rate" type="number" step="0.01"></label>
+        </section>
+
+        <section class="card grid-2">
+          <label class="field"><span class="label">Savings goal amount</span><input id="goal_amount" name="goal_amount" type="number" step="0.01"></label>
+          <label class="field"><span class="label">Months to reach goal</span><input id="goal_months" name="goal_months" type="number"></label>
+        </section>
+
+        <section class="card">
+          <label class="field"><span class="label">Risk profile</span>
+            <select id="risk_profile" name="risk_profile">
+              <option value="conservative">Conservative</option>
+              <option value="moderate" selected>Moderate</option>
+              <option value="aggressive">Aggressive</option>
+            </select>
+          </label>
+        </section>
+
+        <div class="actions">
+          <button id="submit-btn" type="submit" class="btn-primary">Get Advice</button>
+          <button id="clear-btn" type="button" class="btn-secondary">Clear</button>
+        </div>
+      </form>
+
+  <div id="result-container" class="results" aria-live="polite">
+        {% if error %}
+          <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        {% if result %}
+          <div class="server-result">
+            <script>window.__SERVER_RESULT = {{ result | tojson }};</script>
+            <h2>Summary</h2>
+            <p>Total expenses: {{ result.summary.total }}</p>
+            <div class="card">
+              <h4>Expenses by category</h4>
+              <canvas id="category-chart" width="400" height="240" aria-label="Expenses by category"></canvas>
+            </div>
+            <h3>By category</h3>
+            <ul>
+              {% for k,v in result.categorized.items() %}
+                <li>{{ k }}: {{ v }}</li>
+              {% endfor %}
+            </ul>
+            <h3>Budget recommendation</h3>
+            <div class="panel" id="server-recommendation">
+              <p><strong>Baseline:</strong> Essentials: ${{ result.recommendation.baseline.Essentials }}, Wants: ${{ result.recommendation.baseline.Wants }}, Savings: ${{ result.recommendation.baseline.Savings }} per month.</p>
+              {% if result.recommendation.adjustments %}
+                <p>{{ result.recommendation.adjustments | join(' ') }}</p>
+              {% endif %}
+            </div>
+            <h3>Debt</h3>
+            <div class="panel" id="server-debt">
+              {% if result.debt.status == 'no_debt' %}
+                <p>You have no tracked debt.</p>
+              {% elif result.debt.status == 'ok' %}
+                <p>Estimated payoff: {{ result.debt.months_to_payoff }} months (strategy: {{ result.debt.strategy }}, interest rate: {{ result.debt.interest_rate }}%).</p>
+              {% else %}
+                <p>{{ result.debt.message or 'Debt information available.' }}</p>
+              {% endif %}
+            </div>
+            <h3>Investment suggestion (monthly)</h3>
+            <div class="panel" id="server-investment">
+              <p>
+                {% for k,v in result.investment.items() %}
+                  {{ k }}: ${{ v }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+              </p>
+            </div>
+          </div>
+        {% else %}
+          <div class="empty">Enter data and click <strong>Get Advice</strong> to see recommendations.</div>
+        {% endif %}
+      </div>
+    </main>
+
+    <footer>
+      <small>Interactive demo — results are illustrative only.</small>
+    </footer>
+  </div>
+
+  <!-- Chart.js from CDN for the category visualization (load before app.js) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body>
+</html>
+
