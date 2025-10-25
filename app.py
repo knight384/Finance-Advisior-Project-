@@ -86,8 +86,6 @@ def api_advice():
     invest = investment_suggestion(risk, monthly_savings)
     summ = summarize(expenses)
     return jsonify({'categorized':categorized,'recommendation':rec,'debt':debt_info,'investment':invest,'summary':summ})
-
 if __name__ == '__main__':
-    # run on port 5500 so opening http://127.0.0.1:5500 will hit the Flask app
-    # Note: if you have VS Code Live Server or another static server using 5500, stop it first.
-    app.run(host='127.0.0.1', port=5500, debug=True)
+    app.run(host='0.0.0.0', port=5500, debug=True)
+
