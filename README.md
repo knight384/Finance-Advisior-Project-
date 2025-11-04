@@ -6,9 +6,9 @@ Submitted by:
 Name: Anish Choudhary
 Internship Role: Virtual Intern
 Organization: Hack Culprit
-GitHub Profile: @knight384 (replace if you want a different display)
-Project Duration: [Start Date] – [End Date]
-Project Repository: (your repo)
+GitHub Profile: @knight384 
+Project Duration: 1st October – 31st October 2025
+Project Repository: https://github.com/knight384/Finance-Advisior-Project-.git
 
 1. Executive Summary
 
